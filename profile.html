@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ECHO – Player Profile</title>
+    <meta name="description" content="ECHO Player Profile – Abilities, skills, combat stats, and playstyle analysis." />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/effects.css" />
+    <style>
+        /* Avatar Ring */
+        .profile-hero {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-ring {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, var(--clr-primary), var(--clr-secondary), var(--clr-accent), var(--clr-primary));
+            animation: rotate-slow 8s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-inner {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            background: var(--clr-bg2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-inner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.15), transparent 60%);
+        }
+
+        .avatar-online {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 14px;
+            height: 14px;
+            background: var(--clr-green);
+            border: 2px solid var(--clr-bg);
+            border-radius: 50%;
+            box-shadow: var(--glow-green);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-family: var(--font-title);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            color: var(--clr-text);
+            letter-spacing: 3px;
+        }
+
+        .profile-rank {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--clr-gold);
+            letter-spacing: 2px;
+            margin-top: 0.3rem;
+            text-shadow: var(--glow-gold);
+        }
+
+        .titles-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .title-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .title-badge.shadow {
+            color: var(--clr-primary);
+            border-color: rgba(0, 240, 255, 0.4);
+            background: rgba(0, 240, 255, 0.07);
+        }
+
+        .title-badge.combo {
+            color: var(--clr-secondary);
+            border-color: rgba(191, 0, 255, 0.4);
+            background: rgba(191, 0, 255, 0.07);
+        }
+
+        .title-badge.ghost {
+            color: var(--clr-muted);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .title-badge.feared {
+            color: var(--clr-accent);
+            border-color: rgba(255, 58, 110, 0.4);
+            background: rgba(255, 58, 110, 0.07);
+        }
+
+        .title-badge.elite {
+            color: var(--clr-gold);
+            border-color: rgba(255, 215, 0, 0.4);
+            background: rgba(255, 215, 0, 0.07);
+        }
+
+        .profile-stats-mini {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .mini-stat {
+            text-align: left;
+        }
+
+        .mini-stat-val {
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--clr-primary);
+        }
+
+        .mini-stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            color: var(--clr-muted);
+            text-transform: uppercase;
+        }
+
+        /* Abilities */
+        .ability-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--clr-border);
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .ability-card:hover {
+            background: rgba(0, 240, 255, 0.04);
+            border-color: var(--clr-border-bright);
+            transform: translateX(4px);
+        }
+
+        .ability-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .ability-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-clr, rgba(0, 240, 255, 0.4));
+            box-shadow: inset 0 0 10px var(--glow, rgba(0, 240, 255, 0.1));
+        }
+
+        .ability-details {
+            flex: 1;
+        }
+
+        .ability-name {
+            font-family: var(--font-title);
+            font-size: 0.85rem;
+            color: var(--clr-text);
+            letter-spacing: 1px;
+        }
+
+        .ability-desc {
+            font-size: 0.8rem;
+            color: var(--clr-muted);
+            margin-top: 0.2rem;
+        }
+
+        .ability-tier {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        /* Combat Stats Table */
+        .combat-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .combat-table th {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--clr-muted);
+            text-transform: uppercase;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--clr-border);
+        }
+
+        .combat-table td {
+            padding: 0.7rem 0.75rem;
+            font-size: 0.88rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            vertical-align: middle;
+        }
+
+        .combat-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .val-highlight {
+            font-family: var(--font-title);
+            font-weight: 700;
+        }
+
+        /* Radar Chart */
+        .radar-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <div class="hex-grid"></div>
+    <div class="scanlines"></div>
+    <div class="corner-deco tl"></div>
+    <div class="corner-deco tr"></div>
+    <div class="corner-deco bl"></div>
+    <div class="corner-deco br"></div>
+
+    <nav class="nav">
+        <a href="home.html" class="nav-logo">ECHO</a>
+        <ul class="nav-links">
+            <li><a href="home.html">🏠 Home</a></li>
+            <li><a href="profile.html">👤 Profile</a></li>
+            <li><a href="mirror-mage.html">🧠 Mirror Mage</a></li>
+            <li><a href="leaderboard.html">🏆 Leaderboard</a></li>
+            <li><a href="settings.html">⚙️ Settings</a></li>
+        </ul>
+        <div style="display:flex;align-items:center;gap:1rem;">
+            <div class="nav-avatar" id="nav-avatar">⬡</div>
+            <div class="nav-hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <div class="main-content">
+            <div class="container">
+
+                <!-- Profile Hero -->
+                <div class="profile-hero reveal">
+                    <div class="avatar-wrap">
+                        <div class="avatar-ring">
+                            <div class="avatar-inner">🎭</div>
+                        </div>
+                        <div class="avatar-online"></div>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profile-name">SHADOW_OP_7</div>
+                        <div class="profile-rank">⭐ PHANTOM RANK ★★★★ — Season 14</div>
+                        <div class="titles-row">
+                            <span class="title-badge shadow">Shadow Slayer</span>
+                            <span class="title-badge combo">Combo Master</span>
+                            <span class="title-badge ghost">Tactical Ghost</span>
+                            <span class="title-badge feared">Mage's Nemesis</span>
+                            <span class="title-badge elite">Echo Elite</span>
+                        </div>
+                        <div class="profile-stats-mini">
+                            <div class="mini-stat">
+                                <div class="mini-stat-val">Lv.47</div>
+                                <div class="mini-stat-label">Level</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-val">2,847</div>
+                                <div class="mini-stat-label">SR</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-val">4.28</div>
+                                <div class="mini-stat-label">K/D</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-val">96%</div>
+                                <div class="mini-stat-label">Win Rate</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-val">847h</div>
+                                <div class="mini-stat-label">Playtime</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="mirror-mage.html" class="btn btn-purple" style="flex-shrink:0;align-self:flex-start;">🪞
+                        View Your Mirror</a>
+                </div>
+
+                <!-- Skills + Abilities -->
+                <div class="grid-2 reveal">
+                    <!-- Skills -->
+                    <div class="glass-card">
+                        <div class="section-title">⚡ Combat Skills</div>
+                        <p class="section-subtitle">Trained abilities and proficiency ratings</p>
+
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Blade Mastery</span><span
+                                    style="color:var(--clr-primary)">92%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill cyan" data-width="92%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Tactical Awareness</span><span
+                                    style="color:var(--clr-green)">88%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill green" data-width="88%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Echo Manipulation</span><span
+                                    style="color:var(--clr-secondary)">79%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill purple" data-width="79%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Stealth & Evasion</span><span
+                                    style="color:var(--clr-accent)">95%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill red" data-width="95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Temporal Sight</span><span
+                                    style="color:var(--clr-gold)">67%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill gold" data-width="67%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Combo Chaining</span><span
+                                    style="color:var(--clr-primary)">98%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill cyan" data-width="98%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-header"><span>Mirror Counter</span><span
+                                    style="color:var(--clr-secondary)">54%</span></div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill purple" data-width="54%"></div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Radar Chart (SVG) -->
+                        <div class="radar-wrap">
+                            <svg id="radar-chart" width="200" height="200" viewBox="0 0 200 200">
+                                <!-- Background polygons -->
+                                <g id="radar-bg"></g>
+                                <!-- Data polygon -->
+                                <polygon id="radar-data" fill="rgba(0,240,255,0.15)" stroke="#00f0ff" stroke-width="1.5"
+                                    filter="url(#glow)" />
+                                <defs>
+                                    <filter id="glow">
+                                        <feGaussianBlur stdDeviation="3" result="blur" />
+                                        <feMerge>
+                                            <feMergeNode in="blur" />
+                                            <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <!-- Labels -->
+                                <g id="radar-labels" font-family="Orbitron,sans-serif" font-size="8" fill="#5a6a8a"
+                                    text-anchor="middle"></g>
+                                <!-- Dots -->
+                                <g id="radar-dots"></g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Abilities -->
+                    <div class="glass-card">
+                        <div class="section-title">🔮 Abilities</div>
+                        <p class="section-subtitle">Active combat techniques</p>
+
+                        <div class="ability-card">
+                            <div class="ability-icon"
+                                style="background:rgba(0,240,255,0.08);--border-clr:rgba(0,240,255,0.4);--glow:rgba(0,240,255,0.15);">
+                                ⚡</div>
+                            <div class="ability-details">
+                                <div class="ability-name">QUANTUM BLADE</div>
+                                <div class="ability-desc">High-speed slash that phases through reality, dealing temporal
+                                    damage over 3s.</div>
+                            </div>
+                            <span class="ability-tier stat-badge cyan">TIER III</span>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-icon"
+                                style="background:rgba(191,0,255,0.08);--border-clr:rgba(191,0,255,0.4);--glow:rgba(191,0,255,0.15);">
+                                🌀</div>
+                            <div class="ability-details">
+                                <div class="ability-name">SHADOW DASH</div>
+                                <div class="ability-desc">Blinks behind target leaving a decoy echo at origin point.
+                                </div>
+                            </div>
+                            <span class="ability-tier stat-badge purple">TIER III</span>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-icon"
+                                style="background:rgba(255,58,110,0.08);--border-clr:rgba(255,58,110,0.4);--glow:rgba(255,58,110,0.15);">
+                                🔥</div>
+                            <div class="ability-details">
+                                <div class="ability-name">ECHO BURST</div>
+                                <div class="ability-desc">Releases a shockwave of stored temporal energy. Deals 420%
+                                    base damage.</div>
+                            </div>
+                            <span class="ability-tier stat-badge red">TIER IV</span>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-icon"
+                                style="background:rgba(0,255,136,0.08);--border-clr:rgba(0,255,136,0.4);--glow:rgba(0,255,136,0.15);">
+                                🛡️</div>
+                            <div class="ability-details">
+                                <div class="ability-name">MIRROR WARD</div>
+                                <div class="ability-desc">Creates a reflective barrier that mirrors 50% of incoming
+                                    damage back.</div>
+                            </div>
+                            <span class="ability-tier stat-badge green">TIER II</span>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-icon"
+                                style="background:rgba(255,215,0,0.08);--border-clr:rgba(255,215,0,0.4);--glow:rgba(255,215,0,0.15);">
+                                👁️</div>
+                            <div class="ability-details">
+                                <div class="ability-name">TEMPORAL SIGHT</div>
+                                <div class="ability-desc">Reveals enemy patterns stored in the Mirror Mage's memory for
+                                    8s.</div>
+                            </div>
+                            <span class="ability-tier stat-badge gold">TIER II</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combat Statistics -->
+                <div class="glass-card reveal" style="margin-top:1.5rem;">
+                    <div class="section-title">📊 Combat Statistics</div>
+                    <p class="section-subtitle">Season 14 performance data</p>
+                    <div style="overflow-x:auto;">
+                        <table class="combat-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value</th>
+                                    <th>Season Best</th>
+                                    <th>Global %ile</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total Kills</td>
+                                    <td class="val-highlight" style="color:var(--clr-accent)">1,284</td>
+                                    <td>87</td>
+                                    <td><span class="stat-badge red">Top 2%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Deaths</td>
+                                    <td>300</td>
+                                    <td>—</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>K/D Ratio</td>
+                                    <td class="val-highlight" style="color:var(--clr-primary)">4.28</td>
+                                    <td>6.12</td>
+                                    <td><span class="stat-badge cyan">Top 5%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Damage Dealt</td>
+                                    <td class="val-highlight" style="color:var(--clr-green)">2,847,200</td>
+                                    <td>—</td>
+                                    <td><span class="stat-badge green">Top 1%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Combo Chains (10+)</td>
+                                    <td class="val-highlight" style="color:var(--clr-secondary)">342</td>
+                                    <td>—</td>
+                                    <td><span class="stat-badge purple">Top 3%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Highest Damage Combo</td>
+                                    <td class="val-highlight" style="color:var(--clr-gold)">9,840</td>
+                                    <td>—</td>
+                                    <td><span class="stat-badge gold">Top 1%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Mirror Mage Defeats</td>
+                                    <td class="val-highlight" style="color:var(--clr-primary)">28</td>
+                                    <td>—</td>
+                                    <td>—</td>
+                                </tr>
+                                <tr>
+                                    <td>Avg Match Duration</td>
+                                    <td>18m 42s</td>
+                                    <td>—</td>
+                                    <td>—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Playstyle Analysis -->
+                <div class="glass-card reveal" style="margin-top:1.5rem;">
+                    <div class="section-title">🧬 Playstyle Analysis</div>
+                    <p class="section-subtitle">AI-generated behavioral profile based on 847 hours of gameplay</p>
+                    <div class="grid-3" style="margin-top:1rem;">
+                        <div style="text-align:center;padding:1rem;">
+                            <div style="font-size:2.4rem;margin-bottom:0.5rem;">⚡</div>
+                            <div
+                                style="font-family:var(--font-title);font-size:0.85rem;color:var(--clr-primary);letter-spacing:2px;">
+                                AGGRESSIVE</div>
+                            <div style="font-size:0.8rem;color:var(--clr-muted);margin-top:0.3rem;">High-pressure,
+                                constant offense, rarely retreats</div>
+                            <div class="skill-bar-track" style="margin-top:0.5rem;">
+                                <div class="skill-bar-fill cyan" data-width="89%"></div>
+                            </div>
+                        </div>
+                        <div style="text-align:center;padding:1rem;">
+                            <div style="font-size:2.4rem;margin-bottom:0.5rem;">🎭</div>
+                            <div
+                                style="font-family:var(--font-title);font-size:0.85rem;color:var(--clr-secondary);letter-spacing:2px;">
+                                ADAPTIVE</div>
+                            <div style="font-size:0.8rem;color:var(--clr-muted);margin-top:0.3rem;">Adjusts tactics
+                                mid-combat — unpredictable</div>
+                            <div class="skill-bar-track" style="margin-top:0.5rem;">
+                                <div class="skill-bar-fill purple" data-width="74%"></div>
+                            </div>
+                        </div>
+                        <div style="text-align:center;padding:1rem;">
+                            <div style="font-size:2.4rem;margin-bottom:0.5rem;">🎯</div>
+                            <div
+                                style="font-family:var(--font-title);font-size:0.85rem;color:var(--clr-green);letter-spacing:2px;">
+                                PRECISION</div>
+                            <div style="font-size:0.8rem;color:var(--clr-muted);margin-top:0.3rem;">High accuracy,
+                                targeted skill usage</div>
+                            <div class="skill-bar-track" style="margin-top:0.5rem;">
+                                <div class="skill-bar-fill green" data-width="91%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div style="font-size:0.9rem;color:var(--clr-muted);line-height:1.8;padding:0.5rem;">
+                        <strong style="color:var(--clr-text)">AI Analysis: </strong>
+                        You exhibit a predominantly <span style="color:var(--clr-primary)">aggressive-precision</span>
+                        playstyle with high combo dependency (avg combo length: 7.4 attacks). Your signature move is the
+                        <span style="color:var(--clr-secondary)">Quantum Blade → Shadow Dash → Echo Burst</span>
+                        sequence, which the Mirror Mage has flagged as your highest-priority signature move with an
+                        importance score of <span style="color:var(--clr-gold)">9.4/10</span>.
+                        Recommend varying approach vectors to reduce predictability.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Set player name
+        const storedUser = sessionStorage.getItem('echo_user');
+        if (storedUser) {
+            const nameEl = document.getElementById('profile-name');
+            if (nameEl) nameEl.textContent = storedUser.toUpperCase();
+            const nav = document.getElementById('nav-avatar');
+            if (nav) nav.textContent = storedUser[0].toUpperCase();
+        }
+
+        // Draw radar chart
+        window.addEventListener('DOMContentLoaded', () => {
+            const cx = 100, cy = 100, r = 75;
+            const skills = [
+                { label: 'BLADE', val: 0.92 },
+                { label: 'TACTIC', val: 0.88 },
+                { label: 'ECHO', val: 0.79 },
+                { label: 'STEALTH', val: 0.95 },
+                { label: 'SIGHT', val: 0.67 },
+                { label: 'COMBO', val: 0.98 },
+            ];
+            const n = skills.length;
+            const angleStep = (2 * Math.PI) / n;
+
+            const bgEl = document.getElementById('radar-bg');
+            const dataEl = document.getElementById('radar-data');
+            const labelsEl = document.getElementById('radar-labels');
+            const dotsEl = document.getElementById('radar-dots');
+
+            // Background rings
+            [0.25, 0.5, 0.75, 1].forEach(t => {
+                const pts = Array.from({ length: n }, (_, i) => {
+                    const a = i * angleStep - Math.PI / 2;
+                    return `${cx + r * t * Math.cos(a)},${cy + r * t * Math.sin(a)}`;
+                }).join(' ');
+                const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                poly.setAttribute('points', pts);
+                poly.setAttribute('fill', 'none');
+                poly.setAttribute('stroke', 'rgba(0,240,255,0.1)');
+                poly.setAttribute('stroke-width', '1');
+                bgEl.appendChild(poly);
+            });
+
+            // Axis lines
+            skills.forEach((_, i) => {
+                const a = i * angleStep - Math.PI / 2;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+                line.setAttribute('x2', cx + r * Math.cos(a));
+                line.setAttribute('y2', cy + r * Math.sin(a));
+                line.setAttribute('stroke', 'rgba(0,240,255,0.08)');
+                line.setAttribute('stroke-width', '1');
+                bgEl.appendChild(line);
+            });
+
+            // Data polygon (animated)
+            setTimeout(() => {
+                const dataPoints = skills.map((s, i) => {
+                    const a = i * angleStep - Math.PI / 2;
+                    return `${cx + r * s.val * Math.cos(a)},${cy + r * s.val * Math.sin(a)}`;
+                }).join(' ');
+                dataEl.setAttribute('points', dataPoints);
+                dataEl.style.transition = 'all 0.8s ease';
+
+                // Dots
+                skills.forEach((s, i) => {
+                    const a = i * angleStep - Math.PI / 2;
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', cx + r * s.val * Math.cos(a));
+                    circle.setAttribute('cy', cy + r * s.val * Math.sin(a));
+                    circle.setAttribute('r', '3');
+                    circle.setAttribute('fill', '#00f0ff');
+                    circle.setAttribute('filter', 'url(#glow)');
+                    dotsEl.appendChild(circle);
+                });
+            }, 600);
+
+            // Labels
+            skills.forEach((s, i) => {
+                const a = i * angleStep - Math.PI / 2;
+                const lx = cx + (r + 14) * Math.cos(a);
+                const ly = cy + (r + 14) * Math.sin(a);
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', lx);
+                text.setAttribute('y', ly + 3);
+                text.textContent = s.label;
+                labelsEl.appendChild(text);
+            });
+        });
+    </script>
+</body>
+
+</html>
